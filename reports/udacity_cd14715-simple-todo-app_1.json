@@ -1,0 +1,276 @@
+{
+  "pullRequest": {
+    "owner": "udacity",
+    "repo": "cd14715-simple-todo-app",
+    "number": 1
+  },
+  "fileReviews": [
+    {
+      "file": "fixtures/clean-code.ts",
+      "codeQuality": {
+        "file": "fixtures/clean-code.ts",
+        "issues": [
+          {
+            "line": 29,
+            "severity": "low",
+            "category": "best-practice",
+            "description": "Email regex is too simplistic and doesn't follow RFC 5322 standard. Current pattern allows invalid emails like 'a@b.c' and doesn't handle many valid edge cases.",
+            "suggestion": "Use a more comprehensive email validation pattern or a dedicated library like 'email-validator'. Consider following RFC 5322 standards or using a trusted library for consistent email validation."
+          },
+          {
+            "line": 80,
+            "severity": "medium",
+            "category": "bug-risk",
+            "description": "ID generation uses Math.random() which provides insufficient entropy for guaranteed uniqueness in distributed systems. May cause collisions in high-volume scenarios.",
+            "suggestion": "Use crypto.randomUUID() or similar cryptographically secure random generation for production systems to ensure better uniqueness guarantees."
+          },
+          {
+            "line": 58,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "Missing input validation for whitespace-only strings. Current validation would pass strings containing only spaces.",
+            "suggestion": "Add trim and length validation: if (!input.email?.trim() || !input.name?.trim()) to catch strings with only whitespace."
+          },
+          {
+            "line": 71,
+            "severity": "low",
+            "category": "bug-risk",
+            "description": "Email lowercasing should be applied consistently. Email validation happens before normalization which could cause inconsistency.",
+            "suggestion": "Consider validating email format on the lowercased version to ensure case-insensitive validation: const normalizedEmail = input.email.toLowerCase(); if (!isValidEmail(normalizedEmail))"
+          },
+          {
+            "line": 73,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "Sanitization of email is not performed. While email shouldn't typically need HTML sanitization, apply consistent sanitization to all user inputs for defense-in-depth.",
+            "suggestion": "Apply consistent sanitization to all user inputs for defense-in-depth: email: sanitizeInput(input.email.toLowerCase())"
+          },
+          {
+            "line": 47,
+            "severity": "info",
+            "category": "maintainability",
+            "description": "HTML entity escaping could use a helper library for consistency. Manual escaping reduces consistency across the codebase.",
+            "suggestion": "Consider using a library like 'html-escape' or DOMPurify for standardized escaping across the codebase to reduce duplication."
+          },
+          {
+            "line": 94,
+            "severity": "info",
+            "category": "maintainability",
+            "description": "Commented-out database call reduces code clarity. The inactive await statement is confusing.",
+            "suggestion": "Either remove the commented line or add a configuration option to enable/disable actual database operations for testing purposes."
+          },
+          {
+            "line": 56,
+            "severity": "info",
+            "category": "maintainability",
+            "description": "No logging for user creation events. Missing audit trail and debugging information.",
+            "suggestion": "Add logging statements for audit trail and debugging: logger.info('User created', { userId: user.id, email: user.email });"
+          },
+          {
+            "line": 24,
+            "severity": "low",
+            "category": "best-practice",
+            "description": "Missing JSDoc examples in utility functions. Functions lack usage examples, especially important for security-related functions.",
+            "suggestion": "Add JSDoc examples to document function usage, especially for 'sanitizeInput' which has security implications."
+          }
+        ],
+        "overallScore": 87,
+        "summary": "This is high-quality, production-ready code with strong fundamentals. It demonstrates excellent security awareness with parameterized queries and XSS prevention, proper TypeScript typing, and good documentation. Minor issues involve email validation robustness, ID generation entropy, and input normalization that represent refinements rather than critical flaws."
+      },
+      "testCoverage": {
+        "file": "fixtures/clean-code.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [
+          {
+            "type": "function",
+            "location": "Line 24-27: isValidEmail()",
+            "priority": "high",
+            "reasoning": "Email validation is security-critical and user-facing. Invalid patterns could allow malicious inputs or reject legitimate emails.",
+            "suggestedTest": "Test valid emails (user@example.com, test.name+tag@domain.co.uk), invalid emails (missing @, missing domain), and edge cases (empty string, spaces, single character parts)"
+          },
+          {
+            "type": "function",
+            "location": "Line 32-38: sanitizeInput()",
+            "priority": "critical",
+            "reasoning": "XSS prevention is security-critical. Incomplete sanitization could allow script injection attacks and must be thoroughly tested.",
+            "suggestedTest": "Test all character replacements (< > \" '), combined special characters like '<script>alert()</script>', multiple occurrences, and normal text without modification"
+          },
+          {
+            "type": "function",
+            "location": "Line 44-69: createUser()",
+            "priority": "critical",
+            "reasoning": "Main user creation function; must properly validate, sanitize, and persist data. Core business logic that requires comprehensive testing.",
+            "suggestedTest": "Test input validation (missing email, missing name, invalid email), user object creation (ID format, email normalization, sanitization, timestamps), and database interaction"
+          },
+          {
+            "type": "edge-case",
+            "location": "Line 52-58: Input Validation",
+            "priority": "high",
+            "reasoning": "Whitespace-only strings would pass current validation; should be rejected for data quality.",
+            "suggestedTest": "Test with whitespace-only input: createUser({email: ' ', name: ' '}) should throw validation error"
+          },
+          {
+            "type": "function",
+            "location": "Line 76-78: generateId()",
+            "priority": "medium",
+            "reasoning": "ID generation must be unique and properly formatted. Uniqueness is critical for data integrity.",
+            "suggestedTest": "Test ID format matches 'user_TIMESTAMP_RANDOM' pattern, generate multiple IDs to verify uniqueness"
+          },
+          {
+            "type": "branch",
+            "location": "Line 60-67: User Object Construction",
+            "priority": "high",
+            "reasoning": "Email normalization and sanitization must be applied correctly. These transformations are critical for consistent data.",
+            "suggestedTest": "Test email lowercasing (JOHN@EXAMPLE.COM becomes john@example.com) and name sanitization with XSS payloads"
+          },
+          {
+            "type": "function",
+            "location": "Line 82-86: saveUser()",
+            "priority": "high",
+            "reasoning": "Database persistence is critical. Must use parameterized queries to prevent SQL injection and handle async operations correctly.",
+            "suggestedTest": "Mock database and verify parameterized query construction with correct parameter order: [user.id, user.email, user.name, user.createdAt]"
+          }
+        ],
+        "coverageEstimate": 0,
+        "summary": "No tests currently exist for this fixture file. Comprehensive test coverage is needed across all functions, particularly for security-critical functions like email validation and input sanitization. The file contains multiple exported functions that require 100% coverage to ensure correctness and security."
+      },
+      "refactorings": {
+        "file": "fixtures/clean-code.ts",
+        "suggestions": [
+          {
+            "type": "extract-function",
+            "location": "Lines 82-86: saveUser function",
+            "impact": "high",
+            "description": "Implement a repository pattern for database interactions to improve testability and separation of concerns. Decouple database logic from business logic.",
+            "before": "async function saveUser(user: User): Promise<void> {\n  const query = 'INSERT INTO users (id, email, name, created_at) VALUES ($1, $2, $3, $4)';\n  const params = [user.id, user.email, user.name, user.createdAt];\n  // await db.query(query, params);\n}",
+            "after": "interface UserRepository {\n  save(user: User): Promise<void>;\n}\n\nclass DatabaseUserRepository implements UserRepository {\n  constructor(private db: any) {}\n  async save(user: User): Promise<void> {\n    const query = 'INSERT INTO users (id, email, name, created_at) VALUES ($1, $2, $3, $4)';\n    const params = [user.id, user.email, user.name, user.createdAt];\n    await this.db.query(query, params);\n  }\n}",
+            "benefits": "Enables easy mocking for tests, supports multiple database implementations, clear dependency injection pattern, follows SOLID principles"
+          },
+          {
+            "type": "extract-function",
+            "location": "Lines 52-58: Input validation in createUser",
+            "impact": "medium",
+            "description": "Extract input validation logic into a separate function for reusability and single responsibility principle.",
+            "before": "if (!input.email || !input.name) {\n  throw new Error('Email and name are required');\n}\nif (!isValidEmail(input.email)) {\n  throw new Error('Invalid email format');\n}",
+            "after": "function validateUserInput(input: CreateUserInput): void {\n  if (!input.email || !input.name) {\n    throw new Error('Email and name are required');\n  }\n  if (!isValidEmail(input.email)) {\n    throw new Error('Invalid email format');\n  }\n}",
+            "benefits": "Validation logic can be tested independently, can be reused in other functions, createUser is more readable, easier to extend validation rules"
+          },
+          {
+            "type": "extract-function",
+            "location": "Lines 60-67: User object creation in createUser",
+            "impact": "medium",
+            "description": "Extract user object creation logic into a separate function for testability and separation of concerns.",
+            "before": "const user: User = {\n  id: generateId(),\n  email: input.email.toLowerCase(),\n  name: sanitizeInput(input.name),\n  createdAt: new Date()\n};",
+            "after": "function buildUser(email: string, name: string): User {\n  return {\n    id: generateId(),\n    email: email.toLowerCase(),\n    name: sanitizeInput(name),\n    createdAt: new Date()\n  };\n}\nconst user = buildUser(input.email, input.name);",
+            "benefits": "User construction is testable without database calls, clear separation of concerns, easier to modify user creation logic, reusable for updates"
+          },
+          {
+            "type": "modernize",
+            "location": "Line 76-78: generateId function",
+            "impact": "medium",
+            "description": "Use crypto.randomUUID() instead of manual ID construction for better performance, security, and standardization.",
+            "before": "function generateId(): string {\n  return `user_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;\n}",
+            "after": "import { randomUUID } from 'crypto';\n\nfunction generateId(): string {\n  return `user_${randomUUID()}`;\n}",
+            "benefits": "Uses cryptographically secure random ID generation, eliminates collision potential, standard UUID format, better performance, follows industry best practices"
+          },
+          {
+            "type": "simplify",
+            "location": "Lines 27-29: isValidEmail function",
+            "impact": "low",
+            "description": "Extract email regex pattern to a named constant for reusability and maintainability.",
+            "before": "export function isValidEmail(email: string): boolean {\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  return emailRegex.test(email);\n}",
+            "after": "const EMAIL_VALIDATION_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nexport function isValidEmail(email: string): boolean {\n  return EMAIL_VALIDATION_PATTERN.test(email);\n}",
+            "benefits": "Pattern is reusable across codebase, self-documenting constant name, easier to test and maintain, centralized update point"
+          },
+          {
+            "type": "simplify",
+            "location": "Lines 34-41: sanitizeInput function",
+            "impact": "low",
+            "description": "Extract character-to-entity mappings to a constant object and refactor to use single-pass algorithm.",
+            "before": "export function sanitizeInput(input: string): string {\n  return input\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#039;');\n}",
+            "after": "const HTML_ENTITIES: Record<string, string> = {\n  '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#039;'\n};\n\nexport function sanitizeInput(input: string): string {\n  return input.split('').map(char => HTML_ENTITIES[char] ?? char).join('');\n}",
+            "benefits": "More maintainable and clearer intent, single-pass algorithm is faster than multiple replaces, entity map can be reused"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "Lines 54, 57: Error handling in validation",
+            "impact": "medium",
+            "description": "Replace generic Error with custom error classes for better error discrimination and handling.",
+            "before": "throw new Error('Email and name are required');\nthrow new Error('Invalid email format');",
+            "after": "class ValidationError extends Error {\n  constructor(message: string) {\n    super(message);\n    this.name = 'ValidationError';\n  }\n}\n\nthrow new ValidationError('Email and name are required');\nthrow new ValidationError('Invalid email format');",
+            "benefits": "Callers can specifically catch validation errors, better error context and type safety, enables sophisticated error handling, facilitates logging/monitoring"
+          },
+          {
+            "type": "modernize",
+            "location": "Line 52-58: Input validation",
+            "impact": "low",
+            "description": "Use optional chaining and trim() for more defensive input validation against edge cases.",
+            "before": "if (!input.email || !input.name) {\n  throw new Error('Email and name are required');\n}",
+            "after": "if (!input?.email?.trim() || !input?.name?.trim()) {\n  throw new ValidationError('Email and name are required and cannot be empty');\n}",
+            "benefits": "Handles null/undefined gracefully, catches whitespace-only inputs, more defensive against edge cases, clearer intent"
+          }
+        ],
+        "summary": "The code is clean and well-structured but can be enhanced through several refactoring opportunities that would improve testability, maintainability, and adherence to SOLID principles. Most impactful changes are extracting the repository pattern for database operations and breaking down the createUser function into smaller, focused functions."
+      }
+    }
+  ],
+  "summary": {
+    "totalFiles": 1,
+    "overallScore": 87,
+    "criticalIssues": 1,
+    "highPriorityTests": 3,
+    "refactoringOpportunities": 8
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "Testing",
+      "description": "Implement comprehensive test coverage for security-critical functions. Focus on sanitizeInput() and email validation which are XSS and input validation critical paths.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Code Quality",
+      "description": "Implement repository pattern for database operations to decouple business logic from persistence layer. This improves testability and follows SOLID principles.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Security",
+      "description": "Replace Math.random() ID generation with crypto.randomUUID() to ensure cryptographically secure uniqueness in distributed systems and eliminate collision risks.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "description": "Extract validation and user object construction into separate functions. This improves testability, reusability, and code readability by separating concerns.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Robustness",
+      "description": "Improve email validation by using a more comprehensive RFC 5322 compliant pattern or a dedicated library. Current regex allows invalid emails and may reject valid ones.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-10-30T00:00:00Z",
+    "duration": 45000,
+    "agentVersions": {
+      "code-quality-analyzer": "1.0.0",
+      "test-coverage-analyzer": "1.0.0",
+      "refactoring-suggester": "1.0.0"
+    }
+  }
+}
