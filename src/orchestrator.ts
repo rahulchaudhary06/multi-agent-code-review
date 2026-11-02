@@ -86,7 +86,6 @@ export class CodeReviewOrchestrator {
                 },
                 mcpServers: mcpServersConfig,
                 maxTurns: 60,
-                permissionMode: 'bypassPermissions' as any
               }
             })) {
               if (message.type === 'result' && message.subtype === 'success' && message.structured_output) {
